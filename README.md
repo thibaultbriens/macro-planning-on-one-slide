@@ -118,30 +118,6 @@ roadmap-builder/
 
 ---
 
-## Fichier .gitignore recommandé
-
-```gitignore
-# Persistance locale — données utilisateur
-roadmap_data.db
-roadmap_data.dir
-roadmap_data.bak
-roadmap_data.dat
-
-# Environnement virtuel
-.venv/
-env/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# Streamlit
-.streamlit/secrets.toml
-```
-
----
-
 ## Persistance des données
 
 Les données sont sauvegardées automatiquement dans un fichier local (`roadmap_data.db`)

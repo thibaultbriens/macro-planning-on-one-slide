@@ -1,0 +1,18 @@
+# Persistance locale — données utilisateur
+roadmap_data
+roadmap_data.db
+roadmap_data.dir
+roadmap_data.bak
+roadmap_data.dat
+
+# Environnement virtuel
+.venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Streamlit
+.streamlit/secrets.toml
