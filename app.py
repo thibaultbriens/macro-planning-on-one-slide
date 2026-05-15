@@ -59,7 +59,7 @@ C_ROW_ALT   = '#ECEEF5'
 C_PHASE_CONCEPTION = '#27AE60'
 C_PHASE_DEV        = '#E74C3C'
 C_PHASE_TEST       = '#2980B9'
-C_PHASE_DOC        = '#8E44AD'
+C_PHASE_RA        = '#8E44AD'
 C_PHASE_INFRA      = '#D35400'
 C_PHASE_ANALYSE    = '#16A085'
 
@@ -67,7 +67,7 @@ PHASES = {
     "conception": ("CNCPT", C_PHASE_CONCEPTION),
     "dev":        ("DEV",   C_PHASE_DEV),
     "test":       ("TEST",  C_PHASE_TEST),
-    "doc":        ("DOC",   C_PHASE_DOC),
+    "ra":         ("R&A",    C_PHASE_RA),
     "infra":      ("INFRA", C_PHASE_INFRA),
     "analyse":    ("ANAL",  C_PHASE_ANALYSE),
 }
@@ -106,34 +106,42 @@ DEFAULT_SPRINTS = [
 DEFAULT_CHANTIERS = [
     {"name": "Refonte UX/UI", "charge": "3 Dev",
      "livrable": "Page home\n+ header",
+     "description": "",
      "jalon_label": "UI valide client", "jalon_sprint": 2,
      "progress": [(1,"dev"),(1,"dev"),(0.3,"test"),(0,"test"),(None,"dev"),(None,"dev"),(None,"dev"),(None,"dev")]},
     {"name": "Resolution dependances", "charge": "1 Dev",
      "livrable": "0 Critical/High",
+     "description": "",
      "jalon_label": "0 issues Dependabot", "jalon_sprint": 1,
      "progress": [(1,"analyse"),(0.3,"dev"),(0,"test"),(None,"test"),(None,"test"),(None,"test"),(None,"test"),(None,"test")]},
     {"name": "Infra / Octo 3.0", "charge": "2 Ops",
      "livrable": "Env. staging\noperationnel",
+     "description": "",
      "jalon_label": "Env. prod OK", "jalon_sprint": 2,
-     "progress": [(1,"infra"),(1,"infra"),(0.3,"infra"),(0,"infra"),(None,"test"),(None,"test"),(None,"doc"),(None,"doc")]},
+     "progress": [(1,"infra"),(1,"infra"),(0.3,"infra"),(0,"infra"),(None,"test"),(None,"test"),(None,"ra"),(None,"ra")]},
     {"name": "Reduction couts infra", "charge": "2 Ops",
      "livrable": "-26% couts\nobserves",
+     "description": "",
      "jalon_label": "-26% couts infra", "jalon_sprint": 7,
      "progress": [(None,"analyse"),(1,"infra"),(0.5,"infra"),(0.5,"infra"),(0.5,"infra"),(0.5,"infra"),(0.5,"infra"),(0.5,"infra")]},
     {"name": "Recherche par contenu", "charge": "2 Dev",
      "livrable": "Plan valide\nclient",
+     "description": "",
      "jalon_label": "Algo recherche OK", "jalon_sprint": 3,
-     "progress": [(None,"conception"),(0.3,"conception"),(0.3,"dev"),(0.3,"dev"),(0,"test"),(0,"test"),(None,"doc"),(None,"doc")]},
+     "progress": [(None,"conception"),(0.3,"conception"),(0.3,"dev"),(0.3,"dev"),(0,"test"),(0,"test"),(None,"ra"),(None,"ra")]},
     {"name": "Publication auto live", "charge": "1 Dev",
      "livrable": "--",
+     "description": "",
      "jalon_label": "Publication auto", "jalon_sprint": 4,
-     "progress": [(None,"conception"),(None,"conception"),(0,"dev"),(0.3,"dev"),(0.3,"dev"),(0,"test"),(None,"test"),(None,"doc")]},
+     "progress": [(None,"conception"),(None,"conception"),(0,"dev"),(0.3,"dev"),(0.3,"dev"),(0,"test"),(None,"test"),(None,"ra")]},
     {"name": "Sous-titres auto", "charge": "1 Dev",
      "livrable": "--",
+     "description": "",
      "jalon_label": "Sous-titres front+DB", "jalon_sprint": 5,
      "progress": [(None,"conception"),(None,"conception"),(None,"dev"),(0,"dev"),(0.3,"dev"),(0.3,"dev"),(0,"test"),(None,"test")]},
     {"name": "IaC / Terraform", "charge": "2 Ops",
      "livrable": "--",
+     "description": "",
      "jalon_label": "SFU via Terraform", "jalon_sprint": 7,
      "progress": [(None,"conception"),(None,"conception"),(None,"infra"),(0,"infra"),(0,"infra"),(0.3,"infra"),(0.3,"infra"),(0.3,"infra")]},
 ]
@@ -303,9 +311,15 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
     for i, ch in enumerate(chantiers):
         y = y_top - header_h - (i + 1) * row_h
 
-        ax.text(x_name + 0.15, y + row_h/2, ch["name"],
-                ha='left', va='center', fontsize=9.5,
-                fontweight='bold', color=C_TEXT, zorder=4)
+        desc = (ch.get("description", "") or "").strip()
+        name_y = y + row_h/2 + (0.10 if desc else 0.0)
+        ax.text(x_name + 0.15, name_y, ch["name"],
+            ha='left', va='center', fontsize=9.5,
+            fontweight='bold', color=C_TEXT, zorder=4)
+        if desc:
+            ax.text(x_name + 0.15, y + row_h/2 - 0.18, desc,
+                ha='left', va='center', fontsize=7.6,
+                color=C_SUBTEXT, zorder=4)
         ax.text(x_charge + w_charge/2, y + row_h/2, ch["charge"],
                 ha='center', va='center', fontsize=9,
                 color=C_SUBTEXT, zorder=4)
@@ -409,6 +423,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         edgecolor='none', alpha=0.9))
 
     x_leg = bx + bw2 + 0.60
+    legend_gap = 1.35
     statut_items = [
         (C_DONE,    "OK"),
         (C_INPROG,  "WIP"),
@@ -416,14 +431,14 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         ('#B0B5C8', "A venir"),
     ]
     for k, (color, label) in enumerate(statut_items):
-        xl = x_leg + k * 1.75
+        xl = x_leg + k * legend_gap
         ax.add_patch(Circle((xl + 0.12, y_bot + 0.50), 0.10, color=color))
         ax.add_patch(Circle((xl + 0.12, y_bot + 0.50), 0.10, fill=False,
                             edgecolor='white', linewidth=0.8))
         ax.text(xl + 0.28, y_bot + 0.50, label,
                 ha='left', va='center', fontsize=8.5, color=C_TEXT)
 
-    x_sep = x_leg + len(statut_items) * 1.75 + 0.15
+    x_sep = x_leg + len(statut_items) * legend_gap + 0.15
     ax.plot([x_sep, x_sep], [y_bot + 0.08, y_bot + 0.60],
             color=C_BORDER, lw=1.2, alpha=0.7)
 
@@ -431,13 +446,14 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         (C_PHASE_CONCEPTION, "Conception"),
         (C_PHASE_DEV,        "Dev"),
         (C_PHASE_TEST,       "Test"),
-        (C_PHASE_DOC,        "Doc"),
+        (C_PHASE_RA,        "Recettes &\nAjustements"),
         (C_PHASE_INFRA,      "Infra"),
         (C_PHASE_ANALYSE,    "Analyse"),
     ]
     x_ph = x_sep + 0.30
+    phase_gap = 1.35
     for k, (color, label) in enumerate(phase_items):
-        xl = x_ph + k * 1.75
+        xl = x_ph + k * phase_gap
         ax.add_patch(FancyBboxPatch(
             (xl, y_bot + 0.09), 0.22, 0.22,
             boxstyle="round,pad=0.03",
@@ -625,6 +641,13 @@ with col_left:
             with c2:
                 ch_charge = st.text_input("Charge", value=ch["charge"], key=f"ch_charge_{i}")
 
+            ch_description = st.text_area(
+                "Description",
+                value=ch.get("description", ""),
+                key=f"ch_desc_{i}",
+                height=60,
+            )
+
             ch_livrable = st.text_area("Livrable",
                                        value=ch.get("livrable", "--"),
                                        key=f"ch_liv_{i}", height=60)
@@ -680,6 +703,7 @@ with col_left:
                 new_ch = {
                     "name":         ch_name,
                     "charge":       ch_charge,
+                    "description":  ch_description,
                     "livrable":     ch_livrable,
                     "jalon_label":  ch_jalon_label,
                     "jalon_sprint": ch_jalon_sprint,
@@ -701,6 +725,7 @@ with col_left:
     with st.expander("➕ Ajouter un chantier"):
         new_name     = st.text_input("Nom",         key="new_ch_name")
         new_charge   = st.text_input("Charge",      key="new_ch_charge",  value="1 Dev")
+        new_desc     = st.text_area("Description",  key="new_ch_desc",    height=60)
         new_livrable = st.text_input("Livrable",    key="new_ch_liv",     value="--")
         new_jalon    = st.text_input("Label jalon", key="new_ch_jal")
         new_jal_sp   = st.number_input("Sprint jalon", min_value=0,
@@ -711,6 +736,7 @@ with col_left:
                 st.session_state.chantiers.append({
                     "name":         new_name,
                     "charge":       new_charge,
+                    "description":  new_desc,
                     "livrable":     new_livrable,
                     "jalon_label":  new_jalon,
                     "jalon_sprint": new_jal_sp,
