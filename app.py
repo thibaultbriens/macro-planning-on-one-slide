@@ -56,6 +56,8 @@ C_BORDER    = '#C8CBDA'
 C_JALON     = '#8E44AD'
 C_ROW_ALT   = '#ECEEF5'
 
+FONT_SCALE = 1.20
+
 C_PHASE_CONCEPTION = '#27AE60'
 C_PHASE_DEV        = '#E74C3C'
 C_PHASE_TEST       = '#2980B9'
@@ -184,6 +186,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
                      show_vacances, vacances_sprint, vacances_label):
 
     plt.rcParams['font.family'] = 'DejaVu Sans'
+    fs = lambda size: size * FONT_SCALE
 
     n_sp  = len(sprints)
     n_ch  = len(chantiers)
@@ -221,10 +224,10 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
 
     y_title = y_top + 0.70
     ax.text(x_right / 2, y_title, titre,
-            ha='center', va='center', fontsize=18,
+            ha='center', va='center', fontsize=fs(18),
             fontweight='bold', color=C_TEXT)
     ax.text(x_right - 0.10, y_title, f"MAJ : {maj_date}",
-            ha='right', va='center', fontsize=9, color=C_SUBTEXT)
+            ha='right', va='center', fontsize=fs(9), color=C_SUBTEXT)
 
     def header_box(x, w, label, sublabel=None,
                    fc=C_HEADER, tc=C_TEXT, border=C_BORDER, lw=0.8):
@@ -234,14 +237,14 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
             facecolor=fc, edgecolor=border, linewidth=lw, zorder=2))
         if sublabel:
             ax.text(x + w/2, y_top - header_h/2 + 0.10, label,
-                    ha='center', va='center', fontsize=10,
+                    ha='center', va='center', fontsize=fs(10),
                     fontweight='bold', color=tc, zorder=3)
             ax.text(x + w/2, y_top - header_h/2 - 0.13, sublabel,
-                    ha='center', va='center', fontsize=7.5,
+                    ha='center', va='center', fontsize=fs(7.5),
                     color=C_SUBTEXT, zorder=3)
         else:
             ax.text(x + w/2, y_top - header_h/2, label,
-                    ha='center', va='center', fontsize=10,
+                    ha='center', va='center', fontsize=fs(10),
                     fontweight='bold', color=tc, zorder=3)
 
     header_box(x_name,   w_name,   "Chantier")
@@ -258,7 +261,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         facecolor='#EAF9EF', edgecolor=C_DONE, linewidth=1.5, zorder=2))
     ax.text(x_liv + w_liv/2, y_top - header_h/2,
             "Livrable S2", ha='center', va='center',
-            fontsize=10, fontweight='bold', color=C_DONE, zorder=3)
+            fontsize=fs(10), fontweight='bold', color=C_DONE, zorder=3)
 
     for i in range(n_ch):
         y  = y_top - header_h - (i + 1) * row_h
@@ -298,7 +301,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
 
         txt_col = '#FFFFFF' if val != 0 else C_SUBTEXT
         ax.text(x + col_w/2, y + row_h/2 + 0.05, phase_label,
-                ha='center', va='center', fontsize=7,
+            ha='center', va='center', fontsize=fs(7),
                 fontweight='bold', color=txt_col,
                 alpha=0.95 if val != 0 else 0.40, zorder=5)
 
@@ -314,14 +317,14 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         desc = (ch.get("description", "") or "").strip()
         name_y = y + row_h/2 + (0.10 if desc else 0.0)
         ax.text(x_name + 0.15, name_y, ch["name"],
-            ha='left', va='center', fontsize=9.5,
+            ha='left', va='center', fontsize=fs(9.5),
             fontweight='bold', color=C_TEXT, zorder=4)
         if desc:
             ax.text(x_name + 0.15, y + row_h/2 - 0.18, desc,
-                ha='left', va='center', fontsize=7.6,
+                ha='left', va='center', fontsize=fs(9),
                 color=C_SUBTEXT, zorder=4)
         ax.text(x_charge + w_charge/2, y + row_h/2, ch["charge"],
-                ha='center', va='center', fontsize=9,
+                ha='center', va='center', fontsize=fs(9),
                 color=C_SUBTEXT, zorder=4)
 
         prog = ch.get("progress", [])
@@ -344,7 +347,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         for li, line in enumerate(lines):
             off = 0.13 if len(lines) > 1 else 0
             ax.text(x_liv + w_liv/2, y + row_h/2 + off - li * 0.26, line,
-                    ha='center', va='center', fontsize=8.5,
+                    ha='center', va='center', fontsize=fs(8.5),
                     color=C_DONE if not empty else C_SUBTEXT,
                     fontweight='bold' if not empty else 'normal', zorder=5)
 
@@ -356,7 +359,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         boxstyle="round,pad=0.04",
         facecolor='#FAF5FF', edgecolor='#D7BEF0', linewidth=0.8))
     ax.text(0.35, y_jal + jal_h - 0.22, "LIVRABLES FINAUX PAR CHANTIER",
-            ha='left', va='center', fontsize=11,
+            ha='left', va='center', fontsize=fs(11),
             fontweight='bold', color=C_JALON)
 
     y_line = y_jal + 0.60
@@ -386,7 +389,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
             boxstyle="round,pad=0.05",
             facecolor=C_JALON, edgecolor='none', alpha=0.15))
         ax.text(x_j, y_text, combined,
-                ha='center', va='center', fontsize=8,
+            ha='center', va='center', fontsize=fs(8),
                 color=C_JALON, fontweight='bold')
 
     if show_vacances and 0 <= vacances_sprint < n_sp:
@@ -396,7 +399,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
             boxstyle="round,pad=0.04",
             facecolor=C_VACANCES, edgecolor='none', alpha=0.75))
         ax.text(x_vac + col_w/2, y_line + 0.10, vacances_label,
-                ha='center', va='center', fontsize=8,
+            ha='center', va='center', fontsize=fs(8),
                 color='#FFFFFF', fontweight='bold')
 
     y_bot = y_jal - 0.76
@@ -406,11 +409,11 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         facecolor=C_HEADER, edgecolor=C_BORDER, linewidth=1))
 
     ax.text(0.40, y_bot + 0.50, f"{sprint_progress_label} :",
-            ha='left', va='center', fontsize=9.5,
+            ha='left', va='center', fontsize=fs(9.5),
             fontweight='bold', color=C_TEXT)
     ax.text(0.40 + len(sprint_progress_label) * 0.18 + 0.30,
             y_bot + 0.50, f"{sprint_progress}%",
-            ha='left', va='center', fontsize=10,
+            ha='left', va='center', fontsize=fs(10),
             fontweight='bold', color=C_DONE)
 
     bx, by, bw2, bh = 0.40, y_bot + 0.09, 4.20, 0.24
@@ -436,7 +439,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
         ax.add_patch(Circle((xl + 0.12, y_bot + 0.50), 0.10, fill=False,
                             edgecolor='white', linewidth=0.8))
         ax.text(xl + 0.28, y_bot + 0.50, label,
-                ha='left', va='center', fontsize=8.5, color=C_TEXT)
+            ha='left', va='center', fontsize=fs(8.5), color=C_TEXT)
 
     x_sep = x_leg + len(statut_items) * legend_gap + 0.15
     ax.plot([x_sep, x_sep], [y_bot + 0.08, y_bot + 0.60],
@@ -459,10 +462,10 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
             boxstyle="round,pad=0.03",
             facecolor=color, edgecolor='none', alpha=0.85))
         ax.text(xl + 0.30, y_bot + 0.20, label,
-                ha='left', va='center', fontsize=8.5, color=C_TEXT)
+            ha='left', va='center', fontsize=fs(8.5), color=C_TEXT)
 
     ax.text(x_right - 0.15, y_bot + 0.50, capacite,
-            ha='right', va='center', fontsize=8.5, color=C_SUBTEXT)
+            ha='right', va='center', fontsize=fs(8.5), color=C_SUBTEXT)
 
     plt.tight_layout(pad=0)
     buf = io.BytesIO()
@@ -477,7 +480,7 @@ def generate_roadmap(sprints, chantiers, current_sprint, titre, maj_date,
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-    .stApp { background-color: #F5F6FA; color: #1A1A2E; }
+    .stApp { background-color: #F5F6FA; color: #1A1A2E; font-size: 1.2rem; }
     .block-container { padding-top: 1rem; }
     .section-title {
         font-size: 1.05rem; font-weight: 700; color: #4A4A6A;
